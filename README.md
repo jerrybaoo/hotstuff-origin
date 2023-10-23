@@ -1,2 +1,2 @@
 # hotstuff
-A HotStuff-based block finality consensus implemented for Substrate.
+A HotStuff-based block finality tool implemented for Substrate.

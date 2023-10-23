@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+members = [
+    "hotstuff/consensus",
+    "hotstuff/primitives",
+    "pallets/hotstuff"
+]
+[profile.release]
+panic = "unwind"
