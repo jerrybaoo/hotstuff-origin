@@ -4,8 +4,8 @@ use std::{marker::PhantomData, sync::Arc};
 use parity_scale_codec::Decode;
 
 use sc_client_api::{
-	AuxStore, Backend, BlockchainEvents, CallExecutor, ExecutorProvider, Finalizer, LockImportRun,
-	StorageProvider, TransactionFor,
+	AuxStore, Backend, BlockchainEvents, CallExecutor, ExecutionStrategy, ExecutorProvider,
+	Finalizer, LockImportRun, StorageProvider, TransactionFor,
 };
 use sc_consensus::BlockImport;
 use sp_api::ProvideRuntimeApi;
@@ -104,6 +104,7 @@ where
 				self.expect_block_hash_from_id(&BlockId::Number(Zero::zero()))?,
 				"HotstuffApi_authorities",
 				&[],
+				ExecutionStrategy::NativeElseWasm,
 				CallContext::Offchain,
 			)
 			.and_then(|call_result| {
