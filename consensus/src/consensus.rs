@@ -332,7 +332,7 @@ where
 	}
 
 	pub async fn handle_local_timer(&mut self) -> Result<(), HotstuffError> {
-		info!(target: "Hotstuff","$L$ handle_local_timer. self.view {}", self.state.view());
+		debug!(target: "Hotstuff","$L$ handle_local_timer. self.view {}", self.state.view());
 
 		self.local_timer.reset();
 		self.state.increase_last_voted_view();
@@ -386,7 +386,7 @@ where
 			);
 
 			if self.state.is_leader() {
-				info!(target: "Hotstuff","@L@ handle_timeout. leader propose. self.view {}, TC.view {}",
+				debug!(target: "Hotstuff","@L@ handle_timeout. leader propose. self.view {}, TC.view {}",
 					self.state.view(),
 					timeout.view,
 				);
@@ -400,7 +400,7 @@ where
 
 	#[async_recursion]
 	pub async fn handle_proposal(&mut self, proposal: &Proposal<B>) -> Result<(), HotstuffError> {
-		info!(target: "Hotstuff","~~ handle_proposal. self.view {}, proposal[ view:{},  payload:{}, author {}, digest {}]",
+		debug!(target: "Hotstuff","~~ handle_proposal. self.view {}, proposal[ view:{},  payload:{}, author {}, digest {}]",
 			self.state.view(),
 			proposal.view,
 			proposal.payload,
@@ -412,7 +412,7 @@ where
 			match self.client.status(proposal.payload.block_hash) {
 				Ok(block_status) => {
 					if BlockStatus::Unknown == block_status {
-						info!(target:"Hotstuff", "#^# unknown proposal payload {}", proposal.payload);
+						debug!(target:"Hotstuff", "#^# unknown proposal payload {}", proposal.payload);
 						self.sync.set_sync_fork_request(
 							vec![],
 							proposal.payload.block_hash,
@@ -452,7 +452,7 @@ where
 						if grandpa.payload.block_hash != Self::empty_payload_hash()
 							&& grandpa.payload.block_hash != self.client.info().finalized_hash
 						{
-							info!(target: "Hotstuff","^^_^^ handle_proposal. block {} can finalize", grandpa.payload);
+							info!(target: "Hotstuff", "^^_^^. block {} can finalize", grandpa.payload);
 							self.client
 								.finalize_block(grandpa.payload.block_hash, None, true)
 								.map_err(|e| FinalizeBlock(e.to_string()))?;
@@ -460,7 +460,7 @@ where
 					}
 					Ok(())
 				}) {
-			info!(target: "Hotstuff", "~~ handle_proposal. has error when finalize block {:#?}", e);
+			debug!(target: "Hotstuff", "~~ handle_proposal. has error when finalize block {:#?}", e);
 		}
 
 		if proposal.view != self.state.view() {
@@ -516,7 +516,7 @@ where
 			let current_leader = self.state.view_leader(self.state.view());
 			if self.state.local_authority_id().map_or(false, |id| id == current_leader) {
 				if let Some(payload) = self.get_proposal_payload() {
-					info!(target: "Hotstuff","~~ handle_vote. make proposal. payload {}", payload);
+					debug!(target: "Hotstuff","~~ handle_vote. make proposal. payload {}", payload);
 					debug!(target: "Hotstuff", "&-& proposal_hash_queue {:#?}", self.proposal_hash_queue);
 
 					let mut count = 0;
@@ -526,7 +526,7 @@ where
 						}
 						count += 1;
 						if count == 2 && payload.block_hash.eq(&Self::empty_payload_hash()) {
-							info!(target:"Hotstuff", "^^ already has 3 empty proposal, this empty not gossip");
+							debug!(target:"Hotstuff", "^^ already has 3 empty proposal, this empty not gossip");
 							return Ok(());
 						}
 					}
@@ -577,7 +577,7 @@ where
 		self.processing_block = None;
 
 		if self.state.is_leader() {
-			info!(target: "Hotstuff","¥T¥ handle_tc. leader make proposal valid tc, tc.view {}, self.view {}",tc.view, self.state.view());
+			debug!(target: "Hotstuff","¥T¥ handle_tc. leader make proposal valid tc, tc.view {}, self.view {}",tc.view, self.state.view());
 			self.generate_proposal(None).await?;
 		}
 
@@ -653,7 +653,7 @@ where
 			} else {
 				match queue.front().cloned() {
 					Some(info) => {
-						info!(target: "Hotstuff", "Q-Q get_proposal_payload. processing is None,get from queue {}", info.number);
+						debug!(target: "Hotstuff", "Q-Q get_proposal_payload. processing is None,get from queue {}", info.number);
 
 						self.processing_block = Some(info.clone());
 						return Some(Payload::<B> {
