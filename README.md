@@ -69,7 +69,7 @@ First, we need to integrate `pallet-hotstuff` into the runtime.
     }
 ```
 
-## client service
+## Client service
 `hotstuff-consensus` must be launched within the node service for the Hotstuff consensus to function. In the typical Substrate node service startup process, `new_partial` and `new_full` are core functions.
 
 ```
@@ -138,7 +138,7 @@ pub fn new_partial(
        ...
    }
 ```   
-## chain spec
+## Chain spec
 Hotstuff pallet must be initialized in the ChainSpec, or it will result in an incorrect genesis.
 ```
     RuntimeGenesisConfig {
